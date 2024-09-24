@@ -1,112 +1,120 @@
-### **Subnetting Practice Program**
+# Subnetting Quiz: Interactive Learning Tool
 
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Features](#features)
+3. [Requirements](#requirements)
+4. [Installation](#installation)
+5. [Usage](#usage)
+6. [Educational Approach](#educational-approach)
+7. [Demo](#demo)
+8. [License](#license)
 
-### **Features of the Program**
+## Introduction
 
-- **Interactive Questions**: The program asks you several subnetting-related questions for each network.
-- **Colorful Output**: Uses the Rich library to display colorful and formatted text, enhancing readability.
-- **Subnet Details**: Optionally displays a table with subnet details, including network address, first host, last host, and broadcast address.
-- **Scoring System**: Keeps track of your score to help you assess your understanding.
+The Subnetting Quiz is an interactive Python-based learning tool designed to help networking students and professionals practice and understand IP subnetting concepts. This program offers a hands-on approach to learning subnetting, catering to both beginners and advanced users.
 
----
+## Features
 
-### **How to Run the Program**
+- **Interactive Quiz Format**: Engage with subnetting problems in a question-and-answer format.
+- **Difficulty Levels**: Choose between beginner and advanced modes to match your skill level.
+- **Realistic Network Scenarios**: Practice with common private IP ranges used in real-world networking.
+- **Step-by-Step Explanations**: Detailed breakdowns of each subnetting step for better understanding.
+- **Visual Aids**: Utilizes tables and formatted text to present information clearly.
+- **Real-Life Analogies**: Relates subnetting concepts to everyday scenarios for easier comprehension.
+- **Customizable Quiz Length**: Select the number of questions you want to attempt.
+- **Immediate Feedback**: Get instant feedback on your answers and see the correct solutions.
+- **Subnet Details View**: Option to see detailed information about the created subnets.
+- **Advanced Topics**: Introduction to concepts like Variable Length Subnet Masking (VLSM) for advanced users.
 
-1. **Save the Script**: Copy the code above into a file named `subnetting_practice.py`.
+## Requirements
 
-2. **Install Dependencies**:
+- Python 3.6 or higher
+- Rich library (for enhanced console output)
+- 
+## Installation
 
-   ```bash
+1. Clone this repository:
+   ```
+   git clone https://github.com/ms42fg/subnetting.git
+   ```
+
+2. Navigate to the project directory:
+   ```
+   cd subnetting
+   ```
+
+3. Create a virtual environment:
+   ```
+   python3 -m venv venv
+   ```
+
+4. Activate the virtual environment:
+   - On Windows:
+     ```
+     venv\Scripts\activate
+     ```
+   - On macOS and Linux:
+     ```
+     source venv/bin/activate
+     ```
+
+5. Install the required dependencies:
+   ```
    pip install rich
    ```
 
-3. **Run the Program**:
+## Usage
 
-   ```bash
-   python subnetting_practice.py
+1. Ensure you're in the project directory and your virtual environment is activated.
+
+2. Run the script:
+   ```
+   python3 subnetting_quiz.py
    ```
 
----
+3. Follow the on-screen prompts to:
+   - Choose your difficulty level (beginner or advanced)
+   - Select the number of questions you want to attempt
+   - Answer the subnetting questions
 
-### **Sample Interaction**
+4. After completing the quiz, you'll receive your score and have the option to provide feedback.
 
-```
-───────────────────────────── Subnetting Practice Tool ─────────────────────────────
+5. When you're done, you can deactivate the virtual environment:
+   ```
+   deactivate
+   ```
 
-Welcome to the Subnetting Practice Tool!
+2. Follow the on-screen prompts to:
+   - Choose your difficulty level (beginner or advanced)
+   - Select the number of questions you want to attempt
+   - Answer the subnetting questions
 
-How many questions would you like to attempt? [5]: 2
-─────────────────────────────── Question 1 ───────────────────────────────
+3. After completing the quiz, you'll receive your score and have the option to provide feedback.
 
-You have the network: 192.168.12.0/24
-You need to create at least 8 subnets.
+## Educational Approach
 
-1️⃣ How many bits will you borrow from the host portion? 3
-✅ Correct!
+The Subnetting Quiz employs several strategies to facilitate learning:
 
-2️⃣ What is the new subnet mask? 255.255.255.224
-✅ Correct!
+1. **Progressive Difficulty**: Starts with basic concepts and gradually introduces more complex ideas.
+2. **Interactive Learning**: Engages users through active problem-solving rather than passive reading.
+3. **Real-World Context**: Uses practical scenarios to demonstrate the relevance of subnetting skills.
+4. **Visual Learning**: Employs tables, color-coding, and formatted text to aid visual learners.
+5. **Immediate Feedback**: Provides instant correctness checks and explanations to reinforce learning.
+6. **Analogies and Examples**: Relates abstract networking concepts to familiar real-life situations.
 
-3️⃣ How many usable hosts per subnet are available? 30
-✅ Correct!
+## Demo
 
-4️⃣ Would you like to see the subnet details? (yes/no) [no]: yes
+Here's a screenshot of the Subnetting Quiz in action:
 
-                       Subnet Details
-┏━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┓
-┃ Subnet ┃ Network Address ┃ First Host     ┃ Last Host      ┃ Broadcast Address  ┃
-┡━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━┩
-│ 1     │ 192.168.12.0     │ 192.168.12.1   │ 192.168.12.30  │ 192.168.12.31      │
-│ 2     │ 192.168.12.32    │ 192.168.12.33  │ 192.168.12.62  │ 192.168.12.63      │
-│ 3     │ 192.168.12.64    │ 192.168.12.65  │ 192.168.12.94  │ 192.168.12.95      │
-│ 4     │ 192.168.12.96    │ 192.168.12.97  │ 192.168.12.126 │ 192.168.12.127     │
-│ 5     │ 192.168.12.128   │ 192.168.12.129 │ 192.168.12.158 │ 192.168.12.159     │
-│ 6     │ 192.168.12.160   │ 192.168.12.161 │ 192.168.12.190 │ 192.168.12.191     │
-│ 7     │ 192.168.12.192   │ 192.168.12.193 │ 192.168.12.222 │ 192.168.12.223     │
-│ 8     │ 192.168.12.224   │ 192.168.12.225 │ 192.168.12.254 │ 192.168.12.255     │
-└───────┴──────────────────┴────────────────┴────────────────┴────────────────────┘
+![Subnetting Quiz Demo](/data/demo.png)
 
+This image shows an example of a subnetting question, demonstrating the clear layout, color-coded information, and step-by-step guidance provided by the quiz.
 
-─────────────────────────────── Question 2 ───────────────────────────────
+## License
 
-You have the network: 10.45.0.0/16
-You need to create at least 16 subnets.
-
-1️⃣ How many bits will you borrow from the host portion? 4
-✅ Correct!
-
-2️⃣ What is the new subnet mask? 255.255.240.0
-✅ Correct!
-
-3️⃣ How many usable hosts per subnet are available? 4094
-✅ Correct!
-
-4️⃣ Would you like to see the subnet details? (yes/no) [no]: no
-
-
-─────────────────────────── Quiz Complete! ───────────────────────────
-
-Your total score is: 6 out of 6
-
-Thank you for using the Subnetting Practice Tool!
-```
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ---
 
-### **Extending the Program**
-
-Feel free to extend the program to include more subnetting concepts, such as:
-
-- Calculating and verifying network and broadcast addresses.
-- Practicing with Variable Length Subnet Masking (VLSM).
-- Adding explanations for incorrect answers to enhance learning.
-
----
-
-### **Conclusion**
-
-This interactive tool should help you practice and reinforce your understanding of subnetting. By working through each step and receiving immediate feedback, you can gain confidence in your subnetting skills.
-
----
-
-**Happy Subnetting! If you have any questions or need further assistance, feel free to ask.**
+We hope this Subnetting Quiz helps you in your networking journey. Happy learning!
