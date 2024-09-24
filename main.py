@@ -338,7 +338,7 @@ def subnetting_quiz():
 
     console.rule("[bold magenta]Quiz Complete![/bold magenta]")
     print(f"Your total score is: [bold green]{score}[/bold green] out of [bold yellow]{total_questions * 3}[/bold yellow]\n")
-    print("[bold cyan]Thank you for using the Enhanced Subnetting Practice Tool![/bold cyan]")
+    print("[bold cyan]Thank you for using the Subnetting Practice Tool![/bold cyan]")
     print("Remember, subnetting takes practice. Don't worry if it seems confusing at first!")
 
     # Offer additional resources
@@ -347,12 +347,6 @@ def subnetting_quiz():
     print("1. Cisco's Networking Basics: https://www.netacad.com/courses/networking-basics")
     print("2. Professor Messer's Network+ Course: https://www.professormesser.com/network-plus/n10-008/n10-008-training-course/")
     print("3. Practical Networking: https://www.practicalnetworking.net/")
-
-    # Feedback and improvement
-    feedback = Confirm.ask("\nWould you like to provide feedback to help improve this tool?")
-    if feedback:
-        user_feedback = Prompt.ask("Please share your thoughts or suggestions")
-        print("Thank you for your feedback! We'll use it to improve the tool.")
 
 if __name__ == "__main__":
     subnetting_quiz()
