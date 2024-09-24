@@ -113,4 +113,4 @@ This image shows an example of a subnetting question, demonstrating the clear la
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details.
