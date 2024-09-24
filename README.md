@@ -70,7 +70,7 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
 
 2. Run the script:
    ```
-   python3 subnetting_quiz.py
+   python main.py
    ```
 
 3. Follow the on-screen prompts to:
