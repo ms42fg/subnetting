@@ -6,6 +6,7 @@ from rich.panel import Panel
 from rich.text import Text
 import ipaddress
 import random
+import json
 
 console = Console()
 
@@ -126,10 +127,21 @@ def subnetting_quiz():
     display_difficulty_explanation()
     difficulty = Prompt.ask("Choose your difficulty level", choices=["beginner", "advanced"], default="beginner")
     
+    if difficulty == "advanced":
+        show_explanations = Prompt.ask("Would you like to see detailed explanations?", choices=["yes", "no"], default="no")
+    else:
+        show_explanations = "yes"
+    
     total_questions = IntPrompt.ask("How many questions would you like to attempt?", default=3)
     score = 0
+    max_score = total_questions * 4  # Update max score calculation (3 parts + 1 bonus per question)
+
+    # Load questions from JSON file
+    with open('qanda.json', 'r') as f:
+        json_questions = json.load(f)
 
     for question_num in range(1, total_questions + 1):
+        # Original question
         network = generate_network(difficulty)
         if difficulty == 'beginner':
             required_subnets = random.choice([2, 4, 8])
@@ -140,190 +152,233 @@ def subnetting_quiz():
         print(f"You have the network: [bold yellow]{network.with_prefixlen}[/bold yellow]")
         print(f"You need to create at least [bold magenta]{required_subnets} subnets[/bold magenta].\n")
 
-        explain_network(network)
+        if show_explanations == "yes":
+            explain_network(network)
 
-        if difficulty == 'advanced':
+        if difficulty == 'advanced' and show_explanations == "yes":
             print("\n[bold cyan]Advanced Scenario:[/bold cyan]")
             print("You're a network administrator for a growing tech company.")
             print("The company is expanding and needs to set up a new office complex with multiple departments.")
             print(f"Your task is to create at least {required_subnets} subnets to accommodate this expansion.")
 
         # Step 1: Calculate Bits to Borrow
-        print("\n[bold underline]Step 1: Calculate the Number of Bits to Borrow[/bold underline]")
-        print("Let's determine how many bits we need to borrow to create our subnets.")
-        print("We'll use a table to show how many subnets we get for each bit borrowed:\n")
+        correct_bits = (required_subnets - 1).bit_length()
 
-        table = Table(show_header=True, header_style="bold blue")
-        table.add_column("Bits Borrowed", style="cyan")
-        table.add_column("Number of Subnets", style="magenta")
-        table.add_column("Enough?", style="green")
+        if show_explanations == "yes":
+            print("\n[bold underline]Step 1: Calculate the Number of Bits to Borrow[/bold underline]")
+            print("Let's determine how many bits we need to borrow to create our subnets.")
+            print("We'll use a table to show how many subnets we get for each bit borrowed:\n")
 
-        correct_bits = 0
-        for bits in range(1, 8):
-            subnets = 2 ** bits
-            enough = "Yes" if subnets >= required_subnets else "No"
-            table.add_row(str(bits), str(subnets), enough)
-            if subnets >= required_subnets and correct_bits == 0:
-                correct_bits = bits
+            table = Table(show_header=True, header_style="bold blue")
+            table.add_column("Bits Borrowed", style="cyan")
+            table.add_column("Number of Subnets", style="magenta")
+            table.add_column("Enough?", style="green")
 
-        console.print(table)
-        print(f"\nFrom the table, we can see that borrowing [bold yellow]{correct_bits} bits[/bold yellow] gives us enough subnets.")
-        print(f"This is the first row where the 'Enough?' column says 'Yes'.")
-        
+            for bits in range(1, 8):
+                subnets = 2 ** bits
+                enough = "Yes" if subnets >= required_subnets else "No"
+                table.add_row(str(bits), str(subnets), enough)
+
+            console.print(table)
+            print(f"\nFrom the table, we can see that borrowing [bold yellow]{correct_bits} bits[/bold yellow] gives us enough subnets.")
+            print(f"This is the first row where the 'Enough?' column says 'Yes'.")
+
         user_bits = IntPrompt.ask("\n1️⃣ How many bits will you borrow from the host portion?")
         if user_bits == correct_bits:
             print("[bold green]✅ Correct![/bold green]")
             score += 1
         else:
             print(f"[bold red]❌ Incorrect.[/bold red] The correct number of bits is [bold yellow]{correct_bits}[/bold yellow].")
-            print(f"Look at the table and find the first 'Yes' in the 'Enough?' column.")
-
-        # Detailed explanation of binary operation
-        print("\n[bold underline]Detailed Explanation:[/bold underline]")
-        print("Let's break down why borrowing these bits works:")
-        print(f"1. We need at least {required_subnets} subnets.")
-        print(f"2. In binary, each bit we borrow doubles the number of possible combinations.")
-        print("   This is because each bit can be either 0 or 1.")
-        print("3. Let's see how this works:")
-        
-        for i in range(1, correct_bits + 1):
-            combinations = 2 ** i
-            binary_places = '1' * i
-            print(f"   - With {i} bit{'s' if i > 1 else ''}: {binary_places} in binary")
-            print(f"     This gives us {combinations} combination{'s' if combinations > 1 else ''}")
-            print(f"     ({' | '.join([f'{j:0{i}b}' for j in range(combinations)])})")
-        
-        print(f"\nSo, with {correct_bits} bits, we can create {2 ** correct_bits} subnets, which is enough.")
+            if show_explanations == "no":
+                show_explanation = Prompt.ask("Would you like to see the explanation?", choices=["yes", "no"], default="yes")
+                if show_explanation == "yes":
+                    print("\n[bold underline]Detailed Explanation:[/bold underline]")
+                    print("Let's break down why borrowing these bits works:")
+                    print(f"1. We need at least {required_subnets} subnets.")
+                    print(f"2. In binary, each bit we borrow doubles the number of possible combinations.")
+                    print("   This is because each bit can be either 0 or 1.")
+                    print("3. Let's see how this works:")
+                    
+                    for i in range(1, correct_bits + 1):
+                        combinations = 2 ** i
+                        binary_places = '1' * i
+                        print(f"   - With {i} bit{'s' if i > 1 else ''}: {binary_places} in binary")
+                        print(f"     This gives us {combinations} combination{'s' if combinations > 1 else ''}")
+                        print(f"     ({' | '.join([f'{j:0{i}b}' for j in range(combinations)])})")
+                    
+                    print(f"\nSo, with {correct_bits} bits, we can create {2 ** correct_bits} subnets, which is enough.")
 
         # Step 2: Calculate New Subnet Mask
         new_prefix = network.prefixlen + correct_bits
         new_netmask = ipaddress.IPv4Network(f"0.0.0.0/{new_prefix}").netmask
         
-        print("\n[bold underline]Step 2: Determine the New Subnet Mask[/bold underline]")
-        print("When we borrow bits, we're making the network part bigger and the host part smaller.")
-        print("This changes our subnet mask. Let's see how:")
-        
-        print(f"\nOriginal subnet mask: {network.netmask}")
-        print(f"New subnet mask:      {new_netmask}")
-        
-        print("\nHere's how it looks in binary:")
-        original_netmask_binary = binary_converter(str(network.netmask))
-        new_netmask_binary = binary_converter(str(new_netmask))
-        print(f"Original: {original_netmask_binary}")
-        print(f"New:      {new_netmask_binary}")
-        print("Notice how the 1s (network part) have expanded to the right.")
-        
-        # Real-life analogy for subnet mask
-        print("\n[bold cyan]Real-Life Analogy:[/bold cyan]")
-        print("Think of the subnet mask as a building's floor plan:")
-        print("- The 1s represent walls (network boundaries)")
-        print("- The 0s represent open space (host addresses)")
-        print("By changing the subnet mask, we're essentially adding more walls to create smaller rooms (subnets).")
-        
+        if show_explanations == "yes":
+            print("\n[bold underline]Step 2: Determine the New Subnet Mask[/bold underline]")
+            print("When we borrow bits, we're making the network part bigger and the host part smaller.")
+            print("This changes our subnet mask. Let's see how:")
+            
+            print(f"\nOriginal subnet mask: {network.netmask}")
+            print(f"New subnet mask:      {new_netmask}")
+            
+            print("\nHere's how it looks in binary:")
+            original_netmask_binary = binary_converter(str(network.netmask))
+            new_netmask_binary = binary_converter(str(new_netmask))
+            print(f"Original: {original_netmask_binary}")
+            print(f"New:      {new_netmask_binary}")
+            print("Notice how the 1s (network part) have expanded to the right.")
+            
+            # Real-life analogy for subnet mask
+            print("\n[bold cyan]Real-Life Analogy:[/bold cyan]")
+            print("Think of the subnet mask as a building's floor plan:")
+            print("- The 1s represent walls (network boundaries)")
+            print("- The 0s represent open space (host addresses)")
+            print("By changing the subnet mask, we're essentially adding more walls to create smaller rooms (subnets).")
+
         user_netmask = Prompt.ask("\n2️⃣ What is the new subnet mask?")
         if user_netmask.strip() == str(new_netmask):
             print("[bold green]✅ Correct![/bold green]")
             score += 1
         else:
             print(f"[bold red]❌ Incorrect.[/bold red] The correct subnet mask is [bold yellow]{new_netmask}[/bold yellow].")
+            if show_explanations == "no":
+                show_explanation = Prompt.ask("Would you like to see the explanation?", choices=["yes", "no"], default="yes")
+                if show_explanation == "yes":
+                    print("\n[bold underline]Detailed Explanation:[/bold underline]")
+                    print("When we borrow bits, we're making the network part bigger and the host part smaller.")
+                    print("This changes our subnet mask. Let's see how:")
+                    
+                    print(f"\nOriginal subnet mask: {network.netmask}")
+                    print(f"New subnet mask:      {new_netmask}")
+                    
+                    print("\nHere's how it looks in binary:")
+                    original_netmask_binary = binary_converter(str(network.netmask))
+                    new_netmask_binary = binary_converter(str(new_netmask))
+                    print(f"Original: {original_netmask_binary}")
+                    print(f"New:      {new_netmask_binary}")
+                    print("Notice how the 1s (network part) have expanded to the right.")
 
         # Step 3: Calculate Number of Hosts per Subnet
-        original_host_bits = 32 - network.prefixlen
         host_bits = 32 - new_prefix
         num_hosts = (2 ** host_bits) - 2
         
-        print("\n[bold underline]Step 3: Calculate Number of Usable Hosts per Subnet[/bold underline]")
-        print("Now let's find out how many devices (hosts) we can have in each subnet.")
-        print("\nFirst, let's understand how we determine the number of host bits:")
-        print(f"1. An IPv4 address always has a total of 32 bits.")
-        print(f"2. The original network had {network.prefixlen} network bits, leaving {original_host_bits} host bits.")
-        print(f"3. We borrowed {correct_bits} bits for subnetting.")
-        print(f"4. So now we have: {network.prefixlen} (original network bits) + {correct_bits} (borrowed bits) = {new_prefix} network bits")
-        print(f"5. This leaves us with: 32 - {new_prefix} = {host_bits} host bits")
-        
-        print(f"\nSo, we have {host_bits} bits left for hosts.")
-        print("To calculate the number of hosts, we use this formula: (2^host_bits) - 2")
-        print("Let's break it down:")
-        
-        table = Table(show_header=True, header_style="bold blue")
-        table.add_column("Step", style="cyan")
-        table.add_column("Calculation", style="magenta")
-        table.add_column("Result", style="green")
+        if show_explanations == "yes":
+            print("\n[bold underline]Step 3: Calculate Number of Usable Hosts per Subnet[/bold underline]")
+            print("Now let's find out how many devices (hosts) we can have in each subnet.")
+            print("\nFirst, let's understand how we determine the number of host bits:")
+            print(f"1. An IPv4 address always has a total of 32 bits.")
+            print(f"2. The original network had {network.prefixlen} network bits, leaving {32 - network.prefixlen} host bits.")
+            print(f"3. We borrowed {correct_bits} bits for subnetting.")
+            print(f"4. So now we have: {network.prefixlen} (original network bits) + {correct_bits} (borrowed bits) = {new_prefix} network bits")
+            print(f"5. This leaves us with: 32 - {new_prefix} = {host_bits} host bits")
+            
+            print(f"\nSo, we have {host_bits} bits left for hosts.")
+            print("To calculate the number of hosts, we use this formula: (2^host_bits) - 2")
+            print("Let's break it down:")
+            
+            table = Table(show_header=True, header_style="bold blue")
+            table.add_column("Step", style="cyan")
+            table.add_column("Calculation", style="magenta")
+            table.add_column("Result", style="green")
 
-        table.add_row("1. Calculate 2^host_bits", f"2^{host_bits}", str(2**host_bits))
-        table.add_row("2. Subtract 2", f"{2**host_bits} - 2", str(num_hosts))
+            table.add_row("1. Calculate 2^host_bits", f"2^{host_bits}", str(2**host_bits))
+            table.add_row("2. Subtract 2", f"{2**host_bits} - 2", str(num_hosts))
 
-        console.print(table)
-        print(f"\nSo, we can have [bold yellow]{num_hosts}[/bold yellow] usable hosts in each subnet.")
-        
-        print("\n[bold cyan]Why do we subtract 2?[/bold cyan]")
-        print("We subtract 2 because in each subnet:")
-        print("1. The first address is reserved for the network address.")
-        print("2. The last address is reserved for the broadcast address.")
-        print("These two addresses can't be assigned to hosts, hence we subtract them.")
-        
-        # Real-life example for host calculation
-        print("\n[bold cyan]Real-Life Example:[/bold cyan]")
-        print(f"In our office building analogy, each subnet (department) can accommodate up to {num_hosts} devices.")
-        print("This could represent:")
-        print(f"- A small department with up to {num_hosts} computers")
-        print(f"- A floor with {num_hosts} networked devices (computers, printers, phones, etc.)")
-        print(f"- A section of the building with {num_hosts} IP cameras or IoT devices")
-        
+            console.print(table)
+            print(f"\nSo, we can have [bold yellow]{num_hosts}[/bold yellow] usable hosts in each subnet.")
+            
+            print("\n[bold cyan]Why do we subtract 2?[/bold cyan]")
+            print("We subtract 2 because in each subnet:")
+            print("1. The first address is reserved for the network address.")
+            print("2. The last address is reserved for the broadcast address.")
+            print("These two addresses can't be assigned to hosts, hence we subtract them.")
+            
+            # Real-life example for host calculation
+            print("\n[bold cyan]Real-Life Example:[/bold cyan]")
+            print(f"In our office building analogy, each subnet (department) can accommodate up to {num_hosts} devices.")
+            print("This could represent:")
+            print(f"- A small department with up to {num_hosts} computers")
+            print(f"- A floor with {num_hosts} networked devices (computers, printers, phones, etc.)")
+            print(f"- A section of the building with {num_hosts} IP cameras or IoT devices")
+
         user_hosts = IntPrompt.ask("\n3️⃣ How many usable hosts per subnet are available?")
         if user_hosts == num_hosts:
             print("[bold green]✅ Correct![/bold green]")
             score += 1
         else:
             print(f"[bold red]❌ Incorrect.[/bold red] The correct number of hosts is [bold yellow]{num_hosts}[/bold yellow].")
-            print("Remember to subtract 2 from the total number of possible addresses.")
+            if show_explanations == "no":
+                show_explanation = Prompt.ask("Would you like to see the explanation?", choices=["yes", "no"], default="yes")
+                if show_explanation == "yes":
+                    print("\n[bold underline]Detailed Explanation:[/bold underline]")
+                    print(f"We have {host_bits} bits left for hosts.")
+                    print("To calculate the number of hosts, we use this formula: (2^host_bits) - 2")
+                    print("Let's break it down:")
+                    
+                    table = Table(show_header=True, header_style="bold blue")
+                    table.add_column("Step", style="cyan")
+                    table.add_column("Calculation", style="magenta")
+                    table.add_column("Result", style="green")
+
+                    table.add_row("1. Calculate 2^host_bits", f"2^{host_bits}", str(2**host_bits))
+                    table.add_row("2. Subtract 2", f"{2**host_bits} - 2", str(num_hosts))
+
+                    console.print(table)
+                    print(f"\nSo, we can have [bold yellow]{num_hosts}[/bold yellow] usable hosts in each subnet.")
+                    
+                    print("\n[bold cyan]Why do we subtract 2?[/bold cyan]")
+                    print("We subtract 2 because in each subnet:")
+                    print("1. The first address is reserved for the network address.")
+                    print("2. The last address is reserved for the broadcast address.")
+                    print("These two addresses can't be assigned to hosts, hence we subtract them.")
 
         # Step 4: Display Subnet Details
-        list_subnets = Prompt.ask("\n4️⃣ Would you like to see the subnet details? (yes/no)", choices=["yes", "no"], default="yes")
-        if list_subnets.lower() == "yes":
-            subnets = list(network.subnets(prefixlen_diff=correct_bits))
-            print("\n[bold underline]Understanding Subnet Details[/bold underline]")
-            print("Each subnet has four important addresses:")
-            print("1. Network Address: The 'name' of the subnet")
-            print("2. First Host: The first usable address for a device")
-            print("3. Last Host: The last usable address for a device")
-            print("4. Broadcast Address: Used to send messages to all devices in the subnet")
-            
-            table = Table(title=f"Subnet Details (showing first {min(4, len(subnets))} subnets)", show_header=True, header_style="bold blue")
-            table.add_column("Subnet", style="dim")
-            table.add_column("Network Address", style="bold cyan")
-            table.add_column("First Host", style="green")
-            table.add_column("Last Host", style="green")
-            table.add_column("Broadcast Address", style="bold magenta")
+        if show_explanations == "yes":
+            list_subnets = Prompt.ask("\n4️⃣ Would you like to see the subnet details? (yes/no)", choices=["yes", "no"], default="yes")
+            if list_subnets.lower() == "yes":
+                subnets = list(network.subnets(prefixlen_diff=correct_bits))
+                print("\n[bold underline]Understanding Subnet Details[/bold underline]")
+                print("Each subnet has four important addresses:")
+                print("1. Network Address: The 'name' of the subnet")
+                print("2. First Host: The first usable address for a device")
+                print("3. Last Host: The last usable address for a device")
+                print("4. Broadcast Address: Used to send messages to all devices in the subnet")
+                
+                table = Table(title=f"Subnet Details (showing first {min(4, len(subnets))} subnets)", show_header=True, header_style="bold blue")
+                table.add_column("Subnet", style="dim")
+                table.add_column("Network Address", style="bold cyan")
+                table.add_column("First Host", style="green")
+                table.add_column("Last Host", style="green")
+                table.add_column("Broadcast Address", style="bold magenta")
 
-            for idx, subnet in enumerate(subnets[:4]):  # Limit to first 4 subnets for simplicity
-                hosts = list(subnet.hosts())
-                first_host = str(hosts[0]) if hosts else "N/A"
-                last_host = str(hosts[-1]) if hosts else "N/A"
-                table.add_row(
-                    f"{idx + 1}",
-                    str(subnet.network_address),
-                    first_host,
-                    last_host,
-                    str(subnet.broadcast_address)
-                )
-            console.print(table)
+                for idx, subnet in enumerate(subnets[:4]):  # Limit to first 4 subnets for simplicity
+                    hosts = list(subnet.hosts())
+                    first_host = str(hosts[0]) if hosts else "N/A"
+                    last_host = str(hosts[-1]) if hosts else "N/A"
+                    table.add_row(
+                        f"{idx + 1}",
+                        str(subnet.network_address),
+                        first_host,
+                        last_host,
+                        str(subnet.broadcast_address)
+                    )
+                console.print(table)
 
         # Real-life application of subnets
-        print("\n[bold cyan]Real-Life Application:[/bold cyan]")
-        print(f"In our office building scenario, these {min(4, len(subnets))} subnets could represent:")
-        for idx, subnet in enumerate(subnets[:4]):
-            if idx == 0:
-                print(f"Subnet 1: Marketing Department ({num_hosts} available devices)")
-            elif idx == 1:
-                print(f"Subnet 2: Sales Department ({num_hosts} available devices)")
-            elif idx == 2:
-                print(f"Subnet 3: IT Department ({num_hosts} available devices)")
-            elif idx == 3:
-                print(f"Subnet 4: Management ({num_hosts} available devices)")
+        if show_explanations == "yes":
+            print("\n[bold cyan]Real-Life Application:[/bold cyan]")
+            print(f"In our office building scenario, these {min(4, len(subnets))} subnets could represent:")
+            for idx, subnet in enumerate(subnets[:4]):
+                if idx == 0:
+                    print(f"Subnet 1: Marketing Department ({num_hosts} available devices)")
+                elif idx == 1:
+                    print(f"Subnet 2: Sales Department ({num_hosts} available devices)")
+                elif idx == 2:
+                    print(f"Subnet 3: IT Department ({num_hosts} available devices)")
+                elif idx == 3:
+                    print(f"Subnet 4: Management ({num_hosts} available devices)")
 
         # Advanced mode: VLSM explanation
-        if difficulty == 'advanced':
+        if difficulty == 'advanced' and show_explanations == "yes":
             print("\n[bold underline]Advanced Topic: Variable Length Subnet Masking (VLSM)[/bold underline]")
             print("In real-world scenarios, different departments often need different numbers of IP addresses.")
             print("VLSM allows us to create subnets of varying sizes to match these needs more efficiently.")
@@ -336,8 +391,41 @@ def subnetting_quiz():
 
         print("\n")
 
+        # JSON question
+        json_question = random.choice(json_questions)
+        
+        console.rule(f"[bold green]Bonus Question {question_num}[/bold green]")
+        
+        # Display pre-explanation
+        console.print(Panel(json_question['pre_explanation'], title="Context", border_style="cyan"))
+        
+        # Display question
+        console.print(f"\n[bold yellow]{json_question['question']}[/bold yellow]\n")
+        
+        # Display options
+        for i, option in enumerate(json_question['options'], 1):
+            console.print(f"{i}. {option['text']}")
+        
+        # Get user answer
+        user_answer = IntPrompt.ask("Enter your answer (1-4)", choices=[str(i) for i in range(1, 5)])
+        user_answer_text = json_question['options'][user_answer - 1]['text']
+        
+        is_correct = user_answer_text == json_question['correct_answer']
+        if is_correct:
+            console.print("[bold green]✅ Correct![/bold green]")
+            score += 1
+            explanation_border_style = "green"
+        else:
+            console.print(f"[bold red]❌ Incorrect.[/bold red] The correct answer is: [bold yellow]{json_question['correct_answer']}[/bold yellow]")
+            explanation_border_style = "red"
+        
+        # Display explanation
+        console.print(Panel(json_question['post_explanation'], title="Explanation", border_style=explanation_border_style))
+
+        print("\n")
+
     console.rule("[bold magenta]Quiz Complete![/bold magenta]")
-    print(f"Your total score is: [bold green]{score}[/bold green] out of [bold yellow]{total_questions * 3}[/bold yellow]\n")
+    print(f"Your total score is: [bold green]{score}[/bold green] out of [bold yellow]{max_score}[/bold yellow]\n")
     print("[bold cyan]Thank you for using the Subnetting Practice Tool![/bold cyan]")
     print("Remember, subnetting takes practice. Don't worry if it seems confusing at first!")
 
