@@ -7,6 +7,7 @@ from rich.text import Text
 import ipaddress
 import random
 import json
+from collections import defaultdict
 
 console = Console()
 
@@ -47,7 +48,15 @@ def generate_network(difficulty='beginner'):
         
         network = f"{first_octet}.{second_octet}.{third_octet}.0/{cidr}"
     
-    return ipaddress.IPv4Network(network, strict=False)
+    if difficulty == 'beginner':
+        required_subnets = random.choice([2, 4, 8])
+    else:
+        required_subnets = random.randint(2, 32)
+
+    return {
+        "network": ipaddress.IPv4Network(network, strict=False),
+        "required_subnets": required_subnets
+    }
 
 def display_introduction():
     """Display an introduction to subnetting concepts with real-life examples."""
@@ -120,6 +129,21 @@ def display_difficulty_explanation():
         border_style="bold green"
     ))
 
+def load_progress():
+    try:
+        with open('progress.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"questions": defaultdict(int), "bonus_questions": defaultdict(int)}
+
+def save_progress(progress):
+    with open('progress.json', 'w') as f:
+        json.dump(progress, f)
+
+def select_question(questions, progress):
+    weights = [1 + progress[str(i)] for i in range(len(questions))]
+    return random.choices(questions, weights=weights, k=1)[0]
+
 def subnetting_quiz():
     console.clear()
     display_introduction()
@@ -140,13 +164,16 @@ def subnetting_quiz():
     with open('qanda.json', 'r') as f:
         json_questions = json.load(f)
 
+    progress = load_progress()
+
+    questions = [generate_network(difficulty) for _ in range(10)]  # Generate 10 different network configurations
+
     for question_num in range(1, total_questions + 1):
-        # Original question
-        network = generate_network(difficulty)
-        if difficulty == 'beginner':
-            required_subnets = random.choice([2, 4, 8])
-        else:
-            required_subnets = random.randint(2, 32)
+        # Select question based on progress
+        question = select_question(questions, progress['questions'])
+        question_index = questions.index(question)
+        network = question['network']
+        required_subnets = question['required_subnets']
 
         console.rule(f"[bold green]Question {question_num}[/bold green]")
         print(f"You have the network: [bold yellow]{network.with_prefixlen}[/bold yellow]")
@@ -189,6 +216,7 @@ def subnetting_quiz():
             score += 1
         else:
             print(f"[bold red]❌ Incorrect.[/bold red] The correct number of bits is [bold yellow]{correct_bits}[/bold yellow].")
+            progress['questions'][str(question_index)] += 1
             if show_explanations == "no":
                 show_explanation = Prompt.ask("Would you like to see the explanation?", choices=["yes", "no"], default="yes")
                 if show_explanation == "yes":
@@ -240,6 +268,7 @@ def subnetting_quiz():
             score += 1
         else:
             print(f"[bold red]❌ Incorrect.[/bold red] The correct subnet mask is [bold yellow]{new_netmask}[/bold yellow].")
+            progress['questions'][str(question_index)] += 1
             if show_explanations == "no":
                 show_explanation = Prompt.ask("Would you like to see the explanation?", choices=["yes", "no"], default="yes")
                 if show_explanation == "yes":
@@ -306,6 +335,7 @@ def subnetting_quiz():
             score += 1
         else:
             print(f"[bold red]❌ Incorrect.[/bold red] The correct number of hosts is [bold yellow]{num_hosts}[/bold yellow].")
+            progress['questions'][str(question_index)] += 1
             if show_explanations == "no":
                 show_explanation = Prompt.ask("Would you like to see the explanation?", choices=["yes", "no"], default="yes")
                 if show_explanation == "yes":
@@ -388,41 +418,44 @@ def subnetting_quiz():
             print(f"- IT: {num_hosts//4} addresses (using {host_bits-2} host bits)")
             print(f"- Management: {num_hosts//8} addresses (using {host_bits-3} host bits)")
             print("\nThis approach minimizes wasted IP addresses and allows for more flexible network design.")
-
         print("\n")
 
         # JSON question
-        json_question = random.choice(json_questions)
+        bonus_question = select_question(json_questions, progress['bonus_questions'])
+        bonus_question_index = json_questions.index(bonus_question)
         
         console.rule(f"[bold green]Bonus Question {question_num}[/bold green]")
         
         # Display pre-explanation
-        console.print(Panel(json_question['pre_explanation'], title="Context", border_style="cyan"))
+        console.print(Panel(bonus_question['pre_explanation'], title="Context", border_style="cyan"))
         
         # Display question
-        console.print(f"\n[bold yellow]{json_question['question']}[/bold yellow]\n")
+        console.print(f"\n[bold yellow]{bonus_question['question']}[/bold yellow]\n")
         
         # Display options
-        for i, option in enumerate(json_question['options'], 1):
+        for i, option in enumerate(bonus_question['options'], 1):
             console.print(f"{i}. {option['text']}")
         
         # Get user answer
         user_answer = IntPrompt.ask("Enter your answer (1-4)", choices=[str(i) for i in range(1, 5)])
-        user_answer_text = json_question['options'][user_answer - 1]['text']
+        user_answer_text = bonus_question['options'][user_answer - 1]['text']
         
-        is_correct = user_answer_text == json_question['correct_answer']
+        is_correct = user_answer_text == bonus_question['correct_answer']
         if is_correct:
             console.print("[bold green]✅ Correct![/bold green]")
             score += 1
             explanation_border_style = "green"
         else:
-            console.print(f"[bold red]❌ Incorrect.[/bold red] The correct answer is: [bold yellow]{json_question['correct_answer']}[/bold yellow]")
+            console.print(f"[bold red]❌ Incorrect.[/bold red] The correct answer is: [bold yellow]{bonus_question['correct_answer']}[/bold yellow]")
             explanation_border_style = "red"
+            progress['bonus_questions'][str(bonus_question_index)] += 1
         
         # Display explanation
-        console.print(Panel(json_question['post_explanation'], title="Explanation", border_style=explanation_border_style))
-
+        console.print(Panel(bonus_question['post_explanation'], title="Explanation", border_style=explanation_border_style))
         print("\n")
+
+        # Save progress after each question
+        save_progress(progress)
 
     console.rule("[bold magenta]Quiz Complete![/bold magenta]")
     print(f"Your total score is: [bold green]{score}[/bold green] out of [bold yellow]{max_score}[/bold yellow]\n")
