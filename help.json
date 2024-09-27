@@ -1,0 +1,75 @@
+{
+    "subnet_information": {
+      "description": "Provides detailed information about a given subnet, including network address, broadcast address, and usable IP range.",
+      "example": "Input: 192.168.1.0/24\n\nThis will show:\n- Network Address: 192.168.1.0\n- Broadcast Address: 192.168.1.255\n- Usable IP Range: 192.168.1.1 - 192.168.1.254\n- Total usable hosts: 254",
+      "real_world_usage": "Use this when setting up a new office network. If you're assigned the subnet 10.0.50.0/24 by your ISP, this tool will help you understand the range of IP addresses you can assign to devices in your office.",
+      "tips": [
+        "Always verify the subnet mask. A /24 is common for small networks, but larger networks might use /16 or even /8.",
+        "Remember that the first and last IP in a range are reserved for the network and broadcast addresses."
+      ],
+      "context_usage": "In the output, you'll see the network address, broadcast address, and usable IP range. The 'AND Result' shows how the network address is calculated by performing a bitwise AND operation between the IP address and the subnet mask."
+    },
+    "subnet_division": {
+      "description": "Divides a given network into a specified number of equal-sized subnets.",
+      "example": "Input: Network 192.168.0.0/24, Divide into 4 subnets\n\nResult:\n1. 192.168.0.0/26 (192.168.0.0 - 192.168.0.63)\n2. 192.168.0.64/26 (192.168.0.64 - 192.168.0.127)\n3. 192.168.0.128/26 (192.168.0.128 - 192.168.0.191)\n4. 192.168.0.192/26 (192.168.0.192 - 192.168.0.255)",
+      "real_world_usage": "Useful when creating VLANs for different departments in a company. For instance, dividing 10.0.0.0/22 into 4 subnets for Sales, Marketing, IT, and Management departments.",
+      "tips": [
+        "Ensure you have enough address space to create the desired number of subnets.",
+        "Remember that each subnet will have fewer usable IP addresses than the original network.",
+        "Consider future growth when dividing networks."
+      ]
+    },
+    "reverse_subnet_calculation": {
+      "description": "Determines the appropriate subnet mask for a network that needs to accommodate a specific number of hosts, and applies it to a given IP address. Provides alerts and warnings for potential issues.",
+      "example": "Input: 500 hosts, IP: 192.168.0.0\n\nResult:\nIP Address: 192.168.0.0\nNetwork Address: 192.168.0.0\nBroadcast Address: 192.168.1.255\nSubnet mask: 255.255.254.0 (/23)\nActual max hosts: 510\n\nWarning: The chosen subnet is more than twice as large as needed.",
+      "real_world_usage": "When planning a new network or subnet for a specific number of devices. This tool helps you choose the right subnet size, see how it applies to a specific IP range, and alerts you to potential issues like inefficient address space usage or insufficient capacity.",
+      "tips": [
+        "Always plan for more hosts than you currently need to accommodate future growth.",
+        "Pay attention to warnings about subnet size efficiency to avoid wasting IP addresses.",
+        "If you see an alert about insufficient capacity, you'll need to choose a larger subnet.",
+        "The provided IP address helps visualize how the subnet would be applied, but you can adjust it as needed for your network plan.",
+        "If the tool notes that your IP isn't the network address, consider if you meant to use the network address instead.",
+        "Remember that the actual number of usable addresses will be the subnet size minus 2 (for network and broadcast addresses)."
+      ]
+    },
+    "generate_random_ips": {
+      "description": "Generates a specified number of random IP addresses within a given subnet.",
+      "example": "Input: Subnet 172.16.0.0/16, Generate 5 IPs\n\nPossible output:\n1. 172.16.23.45\n2. 172.16.198.76\n3. 172.16.2.200\n4. 172.16.154.89\n5. 172.16.67.123",
+      "real_world_usage": "Useful for testing network configurations or security systems. For instance, generating random IP addresses to simulate traffic from different sources in a network monitoring tool.",
+      "tips": [
+        "Ensure your network devices can handle the IP range you're generating from.",
+        "Use these random IPs cautiously in production environments to avoid conflicts with existing devices.",
+        "Consider using these for creating test data in network simulation software."
+      ]
+    },
+    "subnet_comparison": {
+      "description": "Compares two IP addresses to determine if they belong to the same subnet.",
+      "example": "Input: IP1: 192.168.1.100, IP2: 192.168.1.200, Mask: 255.255.255.0\n\nResult: These IPs are in the same subnet (192.168.1.0/24)",
+      "real_world_usage": "Useful when troubleshooting network connectivity issues. If two devices can't communicate, this tool can quickly tell you if they're in the same subnet or if routing is required.",
+      "tips": [
+        "Remember that devices in different subnets need a router to communicate.",
+        "This tool is particularly useful when dealing with variable length subnet masks (VLSM).",
+        "Always verify the subnet mask, as it's crucial for accurate subnet determination."
+      ]
+    },
+    "generate_python_code": {
+      "description": "Creates a Python script to perform various operations on a given subnet using the 'ipaddress' module.",
+      "example": "Input: 192.168.1.0/24\n\nOutput: Python code to calculate network details, generate IP lists, and check IP membership.",
+      "real_world_usage": "Useful for network administrators or developers creating tools for network management. The generated code can be a starting point for scripts to automate IP address management or network configuration tasks.",
+      "tips": [
+        "Modify the generated code to suit your specific needs, such as integrating it into larger network management scripts.",
+        "Use this as a learning tool to understand how to work with the 'ipaddress' module in Python.",
+        "Consider adding error handling and user input validation to make the script more robust."
+      ]
+    },
+    "identify_subnet": {
+      "description": "Determines the subnet details for a given IP address and subnet mask.",
+      "example": "Input: IP: 172.16.45.178, Mask: 255.255.240.0\n\nResult:\nNetwork: 172.16.32.0/20\nBroadcast: 172.16.47.255\nUsable range: 172.16.32.1 - 172.16.47.254",
+      "real_world_usage": "Helpful when configuring network devices. For instance, if you're setting up a new server and need to know its network details based on its assigned IP and subnet mask.",
+      "tips": [
+        "Use this to quickly identify which part of an IP address represents the network and which part represents the host.",
+        "This is particularly useful when working with unfamiliar or complex subnetting schemes.",
+        "Remember that the first and last addresses in the range are reserved for network and broadcast addresses."
+      ]
+    }
+  }
