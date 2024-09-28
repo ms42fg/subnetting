@@ -31,7 +31,7 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
 
 - Python 3.6 or higher
 - Rich library (for enhanced console output)
-- 
+
 ## Installation
 
 1. Clone this repository:
@@ -45,15 +45,31 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
    ```
 
 3. Create a virtual environment:
-   ```
-   python3 -m venv venv
-   ```
+   - On Windows:
+     If Python is not in your PATH:
+     ```
+     c:\Python35\python -m venv c:\path\to\myenv
+     ```
+     If Python is in your PATH:
+     ```
+     python -m venv c:\path\to\myenv
+     ```
+     Replace `c:\path\to\myenv` with your desired virtual environment location, e.g., `c:\subnetting\venv`.
+   - On macOS and Linux:
+     ```
+     python3 -m venv venv
+     ```
 
 4. Activate the virtual environment:
    - On Windows:
      ```
-     venv\Scripts\activate
+     c:\path\to\myenv\Scripts\activate
      ```
+     If you encounter a PowerShell execution policy error, you may need to run:
+     ```
+     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+     ```
+     Then try activating the virtual environment again.
    - On macOS and Linux:
      ```
      source venv/bin/activate
@@ -84,13 +100,6 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
    ```
    deactivate
    ```
-
-2. Follow the on-screen prompts to:
-   - Choose your difficulty level (beginner or advanced)
-   - Select the number of questions you want to attempt
-   - Answer the subnetting questions
-
-3. After completing the quiz, you'll receive your score and have the option to provide feedback.
 
 ## Educational Approach
 
