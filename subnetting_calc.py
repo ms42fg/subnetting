@@ -81,6 +81,8 @@ def display_subnet_info(network):
     table.add_row("Subnet Mask", str(network.netmask), get_binary_representation(network.netmask))
     table.add_row("Wildcard Mask", str(network.hostmask), get_binary_representation(network.hostmask))
     table.add_row("Number of Hosts", str(network.num_addresses - 2), "")
+    table.add_row("First Usable Host", str(network.network_address + 1), get_binary_representation(network.network_address + 1))
+    table.add_row("Last Usable Host", str(network.broadcast_address - 1), get_binary_representation(network.broadcast_address - 1))
     table.add_row("IP Range", f"{network.network_address + 1} - {network.broadcast_address - 1}", "")
     table.add_row("CIDR Notation", f"/{network.prefixlen}", "")
     
