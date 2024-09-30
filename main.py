@@ -262,7 +262,7 @@ def subnetting_quiz():
             print("- The 0s represent open space (host addresses)")
             print("By changing the subnet mask, we're essentially adding more walls to create smaller rooms (subnets).")
 
-        user_netmask = Prompt.ask("\n2️⃣ What is the new subnet mask?")
+        user_netmask = Prompt.ask("\n2️⃣  What is the new subnet mask?")
         if user_netmask.strip() == str(new_netmask):
             print("[bold green]✅ Correct![/bold green]")
             score += 1
@@ -329,7 +329,7 @@ def subnetting_quiz():
             print(f"- A floor with {num_hosts} networked devices (computers, printers, phones, etc.)")
             print(f"- A section of the building with {num_hosts} IP cameras or IoT devices")
 
-        user_hosts = IntPrompt.ask("\n3️⃣ How many usable hosts per subnet are available?")
+        user_hosts = IntPrompt.ask("\n3️⃣  How many usable hosts per subnet are available?")
         if user_hosts == num_hosts:
             print("[bold green]✅ Correct![/bold green]")
             score += 1
@@ -363,7 +363,7 @@ def subnetting_quiz():
 
         # Step 4: Display Subnet Details
         if show_explanations == "yes":
-            list_subnets = Prompt.ask("\n4️⃣ Would you like to see the subnet details? (yes/no)", choices=["yes", "no"], default="yes")
+            list_subnets = Prompt.ask("\n4️⃣  Would you like to see the subnet details? (yes/no)", choices=["yes", "no"], default="yes")
             if list_subnets.lower() == "yes":
                 subnets = list(network.subnets(prefixlen_diff=correct_bits))
                 print("\n[bold underline]Understanding Subnet Details[/bold underline]")
