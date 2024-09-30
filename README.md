@@ -1,15 +1,5 @@
 # Subnetting Quiz: Interactive Learning Tool
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Requirements](#requirements)
-4. [Installation](#installation)
-5. [Usage](#usage)
-6. [Educational Approach](#educational-approach)
-7. [Demo](#demo)
-8. [License](#license)
-
 ## Introduction
 
 The Subnetting Quiz is an interactive Python-based learning tool designed to help networking students and professionals practice and understand IP subnetting concepts. This program offers a hands-on approach to learning subnetting, catering to both beginners and advanced users.
@@ -61,18 +51,24 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
      ```
 
 4. Activate the virtual environment:
-   - On Windows:
-     ```
-      # In cmd.exe
-      venv\Scripts\activate.bat
-      # In PowerShell
-      venv\Scripts\Activate.ps1
-     ```
-     If you encounter a PowerShell execution policy error, you may need to run:
-     ```
-     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-     ```
-     Then try activating the virtual environment again.
+
+   On Windows:
+   
+   - Using cmd.exe:
+   ```
+   venv\Scripts\activate.bat
+   ```
+
+   - Using PowerShell:
+   ```
+   venv\Scripts\Activate.ps1
+   ```
+
+   Note: If you encounter a PowerShell execution policy error, run the following command:
+   ```
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+   Then try activating the virtual environment again.
      
    - On macOS and Linux:
      ```
