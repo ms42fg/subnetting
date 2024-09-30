@@ -210,7 +210,7 @@ def subnetting_quiz():
             print(f"\nFrom the table, we can see that borrowing [bold yellow]{correct_bits} bits[/bold yellow] gives us enough subnets.")
             print(f"This is the first row where the 'Enough?' column says 'Yes'.")
 
-        user_bits = IntPrompt.ask("\n1️⃣ How many bits will you borrow from the host portion?")
+        user_bits = IntPrompt.ask("\n1️⃣  How many bits will you borrow from the host portion?")
         if user_bits == correct_bits:
             print("[bold green]✅ Correct![/bold green]")
             score += 1
