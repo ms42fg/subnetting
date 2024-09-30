@@ -52,9 +52,9 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
      ```
      If Python is in your PATH:
      ```
-     python -m venv c:\path\to\myenv
+     python -m venv venv
      ```
-     Replace `c:\path\to\myenv` with your desired virtual environment location, e.g., `c:\subnetting\venv`.
+
    - On macOS and Linux:
      ```
      python3 -m venv venv
@@ -63,13 +63,17 @@ The Subnetting Quiz is an interactive Python-based learning tool designed to hel
 4. Activate the virtual environment:
    - On Windows:
      ```
-     c:\path\to\myenv\Scripts\activate
+      # In cmd.exe
+      venv\Scripts\activate.bat
+      # In PowerShell
+      venv\Scripts\Activate.ps1
      ```
      If you encounter a PowerShell execution policy error, you may need to run:
      ```
      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
      ```
      Then try activating the virtual environment again.
+     
    - On macOS and Linux:
      ```
      source venv/bin/activate
